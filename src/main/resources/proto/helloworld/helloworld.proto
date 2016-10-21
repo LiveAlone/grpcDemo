@@ -5,7 +5,7 @@ option java_package = "org.yqj.grpc.demo.helloworld";
 option java_outer_classname = "HelloWorldProto";
 option objc_class_prefix = "HLW";
 
-package org.yqj.grpc.demo.helloworld;
+package helloworld;
 
 // The greeting service definition.
 service Greeter {
