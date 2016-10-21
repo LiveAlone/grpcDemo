@@ -1,4 +1,4 @@
-package org.yqj.boot.demo;
+package org.yqj.grpc.demo;
 
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +16,6 @@ import org.springframework.stereotype.Component;
 public class RunCommanLine implements CommandLineRunner{
 
     public void run(String... args) throws Exception {
-        log.info(" command info run");
         System.out.println("now command line run ");
         System.out.println("args content is " + Lists.newArrayList(args).toString());
     }
