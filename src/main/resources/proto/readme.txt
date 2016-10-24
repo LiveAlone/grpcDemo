@@ -1,5 +1,9 @@
 ﻿protoc使用规范
 
-(1)将protoc.exe配置在环境变量的path中， protoc的版本为2.6.1
-(2)不要删掉proto文件
-(3)这一行是测试的，请忽略 20160811
+windows 文件执行方式
+(1) gen.bat 文件执行 2.6 proto 文件。
+(2) genrpc.bar protobuf 3.0 文件的执行方式。
+
+max ubuntu 编译执行方式。
+（1） protoc 环境变量配置方式
+（2） gen.sh 生成对应的 google 代码配置方式。
