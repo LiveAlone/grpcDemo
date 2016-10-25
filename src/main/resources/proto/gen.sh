@@ -12,6 +12,6 @@ cd $currentPath
 
 for dirlist in $(ls *.proto)
 do
-    protoc --java_out=${targetPath} ${dirlist}
+    protoc --plugin=protoc-gen-grpc-java=protoc-gen-grpc-java --java_out=${targetPath} --grpc-java_out=${targetPath} ${dirlist}
     echo "finish proto : "${dirlist}
 done
