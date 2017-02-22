@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "org.yqj.grpc.demo.document.routeguide";
+option java_outer_classname = "RouteGuideProto";
+
+package routeguide;
+
+service RouteGuide{
+
+    rpc SayHello(MessageNode) returns (MessageResponse){}
+
+    rpc SayHelloStream(MessageNode) returns(stream MessageResponse){}
+
+    rpc SayStreamHello(stream MessageNode) returns (MessageResponse) {}
+
+    rpc SayStreamHelloStream(stream MessageNode) returns (stream MessageResponse) {}
+}
+
+message MessageNode{
+    string message = 1;
+}
+
+message MessageResponse{
+    string response = 2;
+}

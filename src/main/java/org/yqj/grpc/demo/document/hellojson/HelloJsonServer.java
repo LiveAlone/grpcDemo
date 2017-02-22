@@ -1,35 +1,55 @@
 package org.yqj.grpc.demo.document.hellojson;
 
-import io.grpc.MethodDescriptor;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import io.grpc.ServerServiceDefinition;
-import io.grpc.protobuf.ProtoUtils;
 import io.grpc.stub.ServerCalls;
 import io.grpc.stub.StreamObserver;
 import org.yqj.grpc.demo.document.helloworld.GreeterGrpc;
 import org.yqj.grpc.demo.document.helloworld.HelloReply;
 import org.yqj.grpc.demo.document.helloworld.HelloRequest;
 
-import static io.grpc.stub.ServerCalls.asyncUnaryCall;
+import java.util.logging.Logger;
 
 /**
  * Created by yaoqijun.
- * Date:2016-11-01
+ * Date:2016-11-05
  * Email:yaoqijunmail@gmail.io
  * Descirbe:
  */
 public class HelloJsonServer {
 
-    // server grpc 定义方式
+    public static final Logger logger = Logger.getLogger(HelloJsonServer.class.getName());
+
     private int port = 50051;
     private Server server;
 
-    public static void main(String[] args) throws Exception {
-        System.out.println("grpc server demo");
+    public static void main(String[] args) throws  Exception{
         final HelloJsonServer server = new HelloJsonServer();
         server.start();
         server.blockUntilShutdown();
+    }
+
+    private void start() throws Exception{
+
+        server = ServerBuilder.forPort(port).addService(new GreeterImpl())
+                .build().start();
+
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
+            public void run() {
+                // Use stderr here since the logger may have been reset by its JVM shutdown hook.
+                System.err.println("*** shutting down gRPC server since JVM is shutting down");
+                HelloJsonServer.this.stop();
+                System.err.println("*** server shut down");
+            }
+        });
+    }
+
+    private void stop() {
+        if (server != null) {
+            server.shutdown();
+        }
     }
 
     private void blockUntilShutdown() throws InterruptedException {
@@ -38,32 +58,12 @@ public class HelloJsonServer {
         }
     }
 
-    private void start() throws Exception{
-        server = ServerBuilder.forPort(port).addService(new GreeterImpl()).build().start();
-        System.out.println(" server start to listener port");
-
-        Runtime.getRuntime().addShutdownHook(new Thread(){
-            @Override
-            public void run() {
-                System.out.println(" jvm to stop, shut down hook ");
-                HelloJsonServer.this.stop();
-                System.out.println(" stop jvm , and hook ");
-            }
-        });
-    }
-
-    private void stop(){
-        if (server != null){
-            server.shutdown();
-        }
-    }
-
-    private class GreeterImpl extends GreeterGrpc.GreeterImplBase{
+    public static final class GreeterImpl extends GreeterGrpc.GreeterImplBase{
 
         @Override
         public void sayHello(HelloRequest request, StreamObserver<HelloReply> responseObserver) {
             HelloReply helloReply = HelloReply.newBuilder()
-                    .setMessage("hello " + request.getName())
+                    .setMessage("hello "+request.getName())
                     .build();
             responseObserver.onNext(helloReply);
             responseObserver.onCompleted();
@@ -71,18 +71,15 @@ public class HelloJsonServer {
 
         @Override
         public ServerServiceDefinition bindService() {
-            return io.grpc.ServerServiceDefinition
-                    .builder(GreeterGrpc.getServiceDescriptor().getName())
+            return ServerServiceDefinition.builder(GreeterGrpc.getServiceDescriptor().getName())
                     .addMethod(HelloJsonClient.HelloJsonStub.METHOD_SAY_HELLO,
-                            asyncUnaryCall(
-                                    new ServerCalls.UnaryMethod<HelloRequest, HelloReply>() {
-                                        public void invoke(
-                                                HelloRequest request, StreamObserver<HelloReply> responseObserver) {
-                                            sayHello(request, responseObserver);
-                                        }
-                                    }))
+                            ServerCalls.asyncUnaryCall(new ServerCalls.UnaryMethod<HelloRequest, HelloReply>(){
+                                public void invoke(HelloRequest request, StreamObserver<HelloReply> responseObserver) {
+                                    sayHello(request, responseObserver);
+                                }
+                            }))
                     .build();
         }
-
     }
+
 }
